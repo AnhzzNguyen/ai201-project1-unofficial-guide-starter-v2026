@@ -55,41 +55,23 @@ in at least 4 of 5 tries.
 
 ---
 
-## 4. Something about your chunks
+## 4. Chunks contain complete thoughts
 
-<!-- YOU WRITE THIS ONE.
-
-     How would you know if your chunks were the right size? Name something
-     countable or observable.
-
-     Examples of the right shape — don't copy these, they should come from
-     what you actually saw in Milestone 3:
-       - "At least 4 of 5 sampled chunks read as a complete thought, with no
-          sentence cut in half at either end."
-       - "No chunk is shorter than 200 characters, since anything below that
-          in my corpus turned out to be a heading with no content under it." -->
-
-
+In 5 sampled chunks, all contain a complete thought. Someone could answer a
+question using that chunk without reading the sentence before or after it.
 
 **Why this target:**
-
-
+The advice_threads corpus is structured as reply threads with discrete advice points. If chunks are too small, they fragment a single piece of advice across boundaries. If they're too large, they bury the answerable part in surrounding context. All 5 sampled chunks should be independently understandable since each reply is meant to stand on its own as advice.
 
 ---
 
-## 5. Your choice
+## 5. Answer quality: exact phrase matching
 
-<!-- YOU WRITE THIS ONE TOO.
-
-     Pick something you actually care about getting right. It could be about
-     speed, about refusals, about a particular kind of question your corpus
-     handles badly, about source attribution being correct rather than merely
-     present — anything, as long as it names a number or an observable
-     outcome. -->
-
-
+For at least 4 of 5 covered questions, the answer contains the exact phrase from
+the expects field in questions.py.
 
 **Why this target:**
+The test questions have specific expectations grounded in real advice from the corpus — words like "Tuesday", "locker", or "week eight" that appear in my source documents. I'm targeting 4 of 5 rather than all 5 because one question about laundry timing spans multiple documents with slightly different phrasings, so retrieving the core advice concept might not always surface the exact keyword. But the other four have very specific terminology that a good answer should preserve.
 
 
 
