@@ -61,7 +61,7 @@ In 5 sampled chunks, all contain a complete thought. Someone could answer a
 question using that chunk without reading the sentence before or after it.
 
 **Why this target:**
-The advice_threads corpus is structured as reply threads with discrete advice points. If chunks are too small, they fragment a single piece of advice across boundaries. If they're too large, they bury the answerable part in surrounding context. All 5 sampled chunks should be independently understandable since each reply is meant to stand on its own as advice.
+Replies in advice_threads are self-contained advice points (ranging from 68 to 179 characters). I set CHUNK_SIZE to 250 and CHUNK_OVERLAP to 0, respecting the reply structure where each advice point already stands alone. This avoids tiny fragments (like the 2-character tail the starter produced) and ensures all sampled chunks are independently understandable.
 
 ---
 
