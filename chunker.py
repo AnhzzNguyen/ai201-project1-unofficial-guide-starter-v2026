@@ -82,22 +82,87 @@ def fallback_split(
 
 def split_documents(documents: list[Document]) -> list[Chunk]:
     """
-    Split documents into chunks. ⚠️ REPLACE THE BODY OF THIS IN MILESTONE 3.
+    Split documents into chunks respecting reply boundaries.
 
-    Right now it just calls the fallback. That is the plain, generic behaviour
-    the brief is talking about.
+    For advice_threads, each document is a thread with multiple replies separated
+    by "--- reply N ---". Each reply is a self-contained piece of advice.
 
-    When you write your own strategy, set `produced_by` to
-    "chunker.py::split_documents" so your README's Sample Chunks section names
-    the right function. `app.py chunks` prints that string for you.
-
-    Things worth thinking about before you write any code:
-      - Are your documents short posts or long guides?
-      - Is the useful information in one sentence, or spread over a paragraph?
-      - Would splitting on paragraph breaks keep more thoughts intact than
-        splitting on a character count?
+    Strategy:
+    1. Split on reply boundaries first (one chunk per reply, usually)
+    2. If a reply exceeds CHUNK_SIZE, break it on sentence boundaries
+    3. Never produce empty chunks or fragments under 10 characters
     """
-    return fallback_split(documents)
+    chunk_size = config.CHUNK_SIZE
+    chunks: list[Chunk] = []
+
+    for doc in documents:
+        # Split on reply boundaries
+        reply_parts = doc.text.split("--- reply ")
+        thread_header = reply_parts[0]  # The thread title/header
+
+        for reply_index, reply_section in enumerate(reply_parts[1:], 1):
+            # Each reply_section starts with "N (M votes) ---\n"
+            lines = reply_section.split("\n", 1)
+            if len(lines) < 2:
+                continue  # Skip if no body content
+
+            reply_header = lines[0]  # "N (M votes) ---"
+            reply_body = lines[1].strip()
+
+            if not reply_body:
+                continue
+
+            # If the reply is short enough, keep it as one chunk
+            if len(reply_body) <= chunk_size:
+                chunk_text = reply_body
+                if len(chunk_text) >= 10:  # Skip tiny fragments
+                    chunks.append(
+                        Chunk(
+                            text=chunk_text,
+                            source=doc.source,
+                            index=len([c for c in chunks if c.source == doc.source]),
+                            produced_by="chunker.py::split_documents",
+                        )
+                    )
+            else:
+                # Split long replies on sentence boundaries
+                sentences = reply_body.replace(".", ". ").split(". ")
+                current_chunk = ""
+
+                for sentence in sentences:
+                    sentence = sentence.strip()
+                    if not sentence:
+                        continue
+
+                    if len(current_chunk) + len(sentence) + 2 <= chunk_size:
+                        if current_chunk:
+                            current_chunk += " " + sentence
+                        else:
+                            current_chunk = sentence
+                    else:
+                        if current_chunk and len(current_chunk) >= 10:
+                            chunks.append(
+                                Chunk(
+                                    text=current_chunk,
+                                    source=doc.source,
+                                    index=len([c for c in chunks if c.source == doc.source]),
+                                    produced_by="chunker.py::split_documents",
+                                )
+                            )
+                        current_chunk = sentence
+
+                # Add final chunk if it's substantial enough
+                if current_chunk and len(current_chunk) >= 10:
+                    chunks.append(
+                        Chunk(
+                            text=current_chunk,
+                            source=doc.source,
+                            index=len([c for c in chunks if c.source == doc.source]),
+                            produced_by="chunker.py::split_documents",
+                        )
+                    )
+
+    return chunks
 
 
 def describe(chunks: list[Chunk]) -> str:
