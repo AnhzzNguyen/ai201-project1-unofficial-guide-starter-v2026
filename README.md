@@ -21,11 +21,7 @@
 
 ## What This Does
 
-<!-- Three or four sentences. Which corpus you picked, and the kinds of
-     questions your system answers. Write it for someone who has never seen
-     this repo.
-
-     Milestone 5. -->
+This system answers questions about student life at the university using advice from real student discussion threads. The corpus (`advice_threads`) contains 23 threads covering topics like laundry timing, commuting strategies, meal planning, course policies, and campus resources. You can ask questions like "When is laundry free?" or "What's the best way to commute long distances?" and the system retrieves relevant student advice, cites the source documents, and synthesizes an answer. It refuses to answer questions about topics outside the corpus (like cooking techniques or programming languages) by checking whether the retrieved information is actually relevant before answering.
 
 ## Chunking Strategy
 
@@ -100,18 +96,13 @@ I set the threshold at 0.60, squarely in the middle of the gap. This ensures in-
 
 ## How I Used AI
 
-<!-- Two specific moments. For each: what you asked for, what came back, and
-     what you changed about it.
+**1. Chunking function for reply-aware splitting**
 
-     "I asked Claude to write the chunking function from my notes. It ignored
-     the overlap, so I added that myself" is the level of detail we're after.
-     "I used AI to help me code" is not.
+I asked Claude to write a chunker that respects the `--- reply N ---` boundaries in advice_threads instead of using blind character-count splits. I provided my analysis showing that replies average 68–179 characters and each is a standalone thought. Claude returned a function that splits on reply boundaries, applies a character limit, and filters out fragments under 10 characters. I tested it and found it produced 75 clean chunks with no 2-character fragments (compared to 26 with the starter). The implementation matched my intent exactly, so I used it as-is.
 
-     Milestone 5. -->
+**2. Decision framework for chunk size**
 
-**1.**
-
-**2.**
+I asked Claude to help me decide what chunk size and overlap to use, since the generic 800-char starter didn't fit my corpus of short advice threads. Claude provided a comparison table of three options (split on reply boundaries, smaller fixed size, keep current) with pros/cons for each. I walked through my actual documents, saw that replies are self-contained, and picked option A (250 chars, 0 overlap). This structured approach to the decision—grounded in my specific corpus data—was more helpful than asking "what's a good chunk size?"
 
 <!-- ── Stretch features ─────────────────────────────────────────────────────
      Doing one? Say so here BEFORE you start. A feature this README never
