@@ -98,11 +98,11 @@ I set the threshold at 0.60, squarely in the middle of the gap. This ensures in-
 
 **1. Chunking function for reply-aware splitting**
 
-I asked Claude to write a chunker that respects the `--- reply N ---` boundaries in advice_threads instead of using blind character-count splits. I provided my analysis showing that replies average 68–179 characters and each is a standalone thought. Claude returned a function that splits on reply boundaries, applies a character limit, and filters out fragments under 10 characters. I tested it and found it produced 75 clean chunks with no 2-character fragments (compared to 26 with the starter). The implementation matched my intent exactly, so I used it as-is.
+I asked Claude to replace `split_documents` with a function that splits on `--- reply N ---` boundaries instead of using the starter's blind 800-character strategy. I gave it actual numbers from my corpus: replies range 68–179 characters, each is a standalone thought. Claude returned code that splits on boundaries, applies the 250-char limit from config, and filters fragments under 10 characters. I tested the output (75 chunks, no 2-char fragments vs. 26 with the starter's approach). The logic was solid, but I noticed it calculated chunk index inefficiently by looping through all previous chunks. I left it as-is because correctness mattered more than optimization for this pipeline.
 
-**2. Decision framework for chunk size**
+**2. Tightening the grounding instruction**
 
-I asked Claude to help me decide what chunk size and overlap to use, since the generic 800-char starter didn't fit my corpus of short advice threads. Claude provided a comparison table of three options (split on reply boundaries, smaller fixed size, keep current) with pros/cons for each. I walked through my actual documents, saw that replies are self-contained, and picked option A (250 chars, 0 overlap). This structured approach to the decision—grounded in my specific corpus data—was more helpful than asking "what's a good chunk size?"
+I asked Claude to review the generic GROUNDING_INSTRUCTION in generate.py and tighten it for my corpus. Claude came back with the original instruction but suggested four improvements. I accepted most of them: changed "don't guess" to "don't guess or infer," added "quote directly from documents," specified the filename format (e.g., `thread_laundry_timing.txt`), and clarified what to do with multi-source answers. I skipped one suggestion to add "explain confidence" because my corpus is small and advice is usually clear-cut. The tighter rules push the model toward direct quotes and explicit citations, which matters when documents are already well-written student advice.
 
 <!-- ── Stretch features ─────────────────────────────────────────────────────
      Doing one? Say so here BEFORE you start. A feature this README never
