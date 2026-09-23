@@ -277,8 +277,9 @@ GROUNDING_INSTRUCTION = """You answer questions using only the documents provide
 
 Rules:
 - Use only the information in the documents below. Do not use anything you know from elsewhere.
-- If the documents don't cover the question, say you don't have enough information. Do not guess.
-- Name the document your answer came from, using the filename given in each excerpt.
+- If the documents don't cover the question, say you don't have enough information. Do not guess or infer.
+- Quote directly from the documents when possible. Always cite the filename (e.g., thread_laundry_timing.txt).
+- If the answer comes from multiple documents, cite all of them.
 - Be brief. Two or three sentences is usually enough."""
 
 
