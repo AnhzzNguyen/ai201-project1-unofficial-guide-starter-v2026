@@ -68,15 +68,11 @@ The library being open until 2am is a trap. It's a resource, not a schedule.
 
 ## Sample Answer
 
-<!-- One complete question and answer, pasted as text, with the source line
-     visible. Milestone 4. -->
-
-**Question:**
+**Question:** When can students declare the pass/fail option for a course, and what should they consider first?
 
 **Answer:**
 
-```
-```
+According to student advice (thread_first_year_regret.txt), you can declare pass/fail "late — up to week eight." Before declaring, consider that "if you're applying to graduate programmes, some want a letter grade for prerequisites and a P doesn't satisfy it" (thread_pass_fail.txt). Additionally, there's a limit of "two per year and eight across the degree," so use them strategically (thread_pass_fail.txt).
 
 **My relevance cutoff:** 0.60
 
