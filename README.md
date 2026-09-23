@@ -29,53 +29,41 @@
 
 ## Chunking Strategy
 
-**Chunk size:**
-**Overlap:**
+**Chunk size:** 250 characters
+**Overlap:** 0 characters
 
-<!-- What about YOUR documents made you pick these numbers? Short posts and
-     long sectioned guides don't want the same chunking, and "800 seemed
-     reasonable" earns nothing. Point at something you noticed when you read
-     the documents in Milestone 1.
-
-     If you changed your mind partway through, say so and say why. That's worth
-     more than pretending you got it right first time.
-
-     Milestone 3. -->
+Replies in advice_threads are self-contained advice points, ranging from 68 to 179 characters each. I observed that each reply is a complete thought meant to stand alone—splitting on the `--- reply N ---` boundaries respects this structure rather than artificially cutting at character counts. A 250-character limit keeps most replies intact as single chunks, and zero overlap avoids the tiny fragments (like the 2-character tail) that the starter's generic 800-character strategy produced. The resulting 75 chunks average 121 characters with no fragments under 68 characters, meeting criterion 4: each chunk is a complete thought usable without context.
 
 ## Sample Chunks
 
-<!-- Five chunks, pasted as text. Label each one and name the file it came from
-     AND the function that produced it — the grader checks your code against
-     what you claim here.
-
-     `python app.py chunks -n 5` prints all three for you. Copy them straight
-     across.
-
-     Milestone 3. -->
-
-**Chunk 1** — source: `` — produced by: ``
+**Chunk 1** — source: `thread_bike_commute.txt#0` — produced by: `chunker.py::split_documents`
 
 ```
+Yeah. Cuts an 18 minute walk to about 6. The thing nobody mentions is storage — covered bike parking exists at three buildings and is full by 9am at all three.
 ```
 
-**Chunk 2** — source: `` — produced by: ``
+**Chunk 2** — source: `thread_first_gen.txt#1` — produced by: `chunker.py::split_documents`
 
 ```
+The thing I'd say: the unwritten rules are the hard part, not the coursework. Ask about the unwritten rules explicitly. People are happy to explain them and nobody volunteers them.
 ```
 
-**Chunk 3** — source: `` — produced by: ``
+**Chunk 3** — source: `thread_laptop_specs.txt#2` — produced by: `chunker.py::split_documents`
 
 ```
+I did two years on an 8GB machine and it was fine until the last project, at which point it very much wasn't. 16 is the answer.
 ```
 
-**Chunk 4** — source: `` — produced by: ``
+**Chunk 4** — source: `thread_parking.txt#1` — produced by: `chunker.py::split_documents`
 
 ```
+Street parking on Verrill is legal and free and unmarked, which is why half the upper years do it.
 ```
 
-**Chunk 5** — source: `` — produced by: ``
+**Chunk 5** — source: `thread_sleep_schedule.txt#1` — produced by: `chunker.py::split_documents`
 
 ```
+The library being open until 2am is a trap. It's a resource, not a schedule.
 ```
 
 ## Sample Answer
