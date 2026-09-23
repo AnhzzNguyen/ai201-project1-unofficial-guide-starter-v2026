@@ -78,20 +78,29 @@ The library being open until 2am is a trap. It's a resource, not a schedule.
 ```
 ```
 
-**My relevance cutoff:**
+**My relevance cutoff:** 0.60
 
-<!-- The number you set in config.py, and how you got there.
-
-     You ran five questions your corpus covers and the five in OUT_OF_SCOPE
-     that it clearly doesn't, and wrote down the best distance for each. What
-     did those two groups look like? Where was the gap? Put the actual numbers
-     here — the table below wants all ten rows.
-
-     Milestone 4. -->
+Measured best distances for all ten questions:
 
 | Question | In corpus? | Best distance |
 |---|---|---|
-|  |  |  |
+| When is laundry free in the dorms and which days should students avoid? | Yes | 0.520 |
+| What time window can students change their meal plan, and what happens if they miss it? | Yes | 0.536 |
+| What are the benefits of stacking courses for students who commute long distances? | Yes | 0.465 |
+| What resource in the student centre can make commuting easier, and how much does it cost? | Yes | 0.482 |
+| When can students declare the pass/fail option for a course, and what should they consider first? | Yes | 0.348 |
+| What is the capital of Mongolia? | No | 0.891 |
+| How do I change the oil in a diesel engine? | No | 0.720 |
+| Who won the 1994 World Cup? | No | 0.929 |
+| What is the recommended dosage of ibuprofen for a headache? | No | 0.760 |
+| How do I write a for loop in Rust? | No | 0.909 |
+
+**Two groups with a clear gap:**
+- In-corpus: 0.348–0.536 (all well below cutoff)
+- Out-of-scope: 0.720–0.929 (all well above cutoff)
+- Gap: 0.536 to 0.720 (0.184 margin)
+
+I set the threshold at 0.60, squarely in the middle of the gap. This ensures in-corpus questions (criterion 1) will retrieve their answers, while out-of-scope questions (criterion 3) will be refused with high confidence.
 
 ## How I Used AI
 
