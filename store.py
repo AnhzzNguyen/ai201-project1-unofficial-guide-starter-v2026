@@ -28,6 +28,7 @@ from dataclasses import dataclass
 os.environ.setdefault("ANONYMIZED_TELEMETRY", "False")
 
 import chromadb  # noqa: E402
+from rank_bm25 import BM25Okapi
 
 import config
 from chunker import Chunk
@@ -185,9 +186,25 @@ def search(
     variant: str = "default",
 ) -> list[Result]:
     """
-    Retrieve the chunks closest in meaning to a question.
+    Retrieve chunks using hybrid search (semantic + keyword matching).
 
-    Returns them nearest-first, each with its distance.
+    Combines embedding-based semantic search with BM25 keyword search using
+    reciprocal rank fusion. This catches both meaning and exact terms.
+    """
+    return search_hybrid(question, top_k, corpus, variant)
+
+
+def search_hybrid(
+    question: str,
+    top_k: int | None = None,
+    corpus: str | None = None,
+    variant: str = "default",
+) -> list[Result]:
+    """
+    Hybrid search: combine semantic (embedding) and keyword (BM25) retrieval.
+
+    Semantic search catches meaning; BM25 catches exact terms. Blend both
+    ranked lists using reciprocal rank fusion.
     """
     top_k = top_k or config.TOP_K
     name = config.collection_name(corpus, variant)
@@ -199,22 +216,64 @@ def search(
             f"No index called '{name}'. Run `python app.py index` first."
         ) from exc
 
+    # Semantic search (embedding-based)
     raw = collection.query(
         query_embeddings=embed([question]),
-        n_results=min(top_k, collection.count()),
+        n_results=min(top_k * 2, collection.count()),  # Get more results for hybrid fusion
     )
 
-    results: list[Result] = []
-    for text, meta, distance in zip(
+    semantic_results = {}
+    for i, (text, meta, distance) in enumerate(zip(
         raw["documents"][0], raw["metadatas"][0], raw["distances"][0]
-    ):
+    )):
+        label = f"{meta.get('source', 'unknown')}#{meta.get('index', 0)}"
+        semantic_results[label] = {
+            "rank": i + 1,
+            "text": text,
+            "source": str(meta.get("source", "unknown")),
+            "distance": float(distance),
+            "produced_by": str(meta.get("produced_by", "unknown")),
+        }
+
+    # Keyword search (BM25) on all retrieved docs
+    all_docs = [r["text"] for r in semantic_results.values()]
+    all_labels = list(semantic_results.keys())
+
+    tokenized_docs = [doc.lower().split() for doc in all_docs]
+    bm25 = BM25Okapi(tokenized_docs)
+    query_tokens = question.lower().split()
+    bm25_scores = bm25.get_scores(query_tokens)
+
+    # Create ranking from BM25 scores
+    bm25_ranking = sorted(enumerate(bm25_scores), key=lambda x: x[1], reverse=True)
+
+    # Reciprocal rank fusion: combine the two ranking systems
+    fused_scores = {}
+    k = 60  # RRF parameter
+
+    # Add semantic scores
+    for label, result in semantic_results.items():
+        rank = result["rank"]
+        fused_scores[label] = 1.0 / (k + rank)
+
+    # Add BM25 scores
+    for bm25_rank, (doc_idx, _) in enumerate(bm25_ranking):
+        label = all_labels[doc_idx]
+        fused_scores[label] = fused_scores.get(label, 0) + (1.0 / (k + bm25_rank + 1))
+
+    # Sort by fused score and return top-k
+    sorted_labels = sorted(fused_scores.keys(), key=lambda x: fused_scores[x], reverse=True)[:top_k]
+
+    results: list[Result] = []
+    for label in sorted_labels:
+        r = semantic_results[label]
         results.append(
             Result(
-                text=text,
-                source=str(meta.get("source", "unknown")),
-                label=f"{meta.get('source', 'unknown')}#{meta.get('index', 0)}",
-                distance=float(distance),
-                produced_by=str(meta.get("produced_by", "unknown")),
+                text=r["text"],
+                source=r["source"],
+                label=label,
+                distance=r["distance"],
+                produced_by=r["produced_by"],
             )
         )
     return results
