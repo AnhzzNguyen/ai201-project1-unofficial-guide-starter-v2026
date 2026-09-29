@@ -182,7 +182,17 @@ Students can declare a course pass/fail "up to week eight" (thread_first_year_re
 
 ## Diagnoses
 
-**Q1 (laundry timing):** The question asks "When is laundry free...and which days should students avoid?" The answer in the corpus covers both: "Tuesday and Wednesday mornings...Sunday evening is the worst." However, the retrieved chunk ranked best (0.520 distance) didn't include the "Tuesday/Wednesday" part—only the "Sunday evening" part made it to the top retrieval. The chunker splits on reply boundaries, and this advice spans one reply, so it should be one chunk. The embedding distance (0.520) is weaker than expected for such a direct match. This suggests a semantic mismatch between the question phrasing ("When is laundry free?") and the chunk text ("Tuesday and Wednesday mornings")—the embedding model may not recognize "free" ≈ "mornings" as closely related. Retrieval stage issue, not chunking."
+**Missed nothing.** All five criteria were met. However, I set the targets conservatively, and criteria 1 and 5 both show the same underlying issue with Q1 that narrowly avoided triggering a miss.
+
+**Q1 (laundry timing) — close call on criteria 1 and 5:**
+
+*Stage: Retrieval + Embedding*
+
+*Mechanism:* The question asks "When is laundry free...which days should students avoid?" The corpus has one reply that answers both: "Tuesday and Wednesday mornings...Sunday evening is the worst." However, the embedding distance is 0.520 — weaker than expected for a direct semantic match. The retrieved chunk ranked first but contains only the negative advice ("Sunday evening is the worst") while the positive answer ("Tuesday/Wednesday mornings") is in the same chunk but apparently didn't surface equally. This suggests the embedding model treats "When is laundry free?" and "Tuesday and Wednesday mornings" as only moderately similar — perhaps because "free" (question phrasing) and "mornings" (chunk phrasing) aren't semantically aligned in the embedding space. The chunk itself is fine (one complete reply per chunking strategy), but the question-to-chunk embedding distance is suboptimal.
+
+**Pattern:** Only one miss across all criteria, and it's consistently the same question (Q1). Not a systemic problem — one embedding distance issue rather than a pattern of chunking errors or generation failures.
+
+**On target conservatism:** I set criteria 1 and 5 to "4 of 5" precisely to accommodate one difficult question. Q1 nearly triggered both. If I'd set them to "5 of 5," the system would have missed. I'd tighten criterion 1 to "all 5 questions must have the answer in top-7 results with distance < 0.55" to catch the Q1 embedding weakness earlier in future iterations.
 
      The five stages: loading → chunking → embedding → retrieval → generation.
 
