@@ -127,7 +127,35 @@ I asked Claude to review the generic GROUNDING_INSTRUCTION in generate.py and ti
 | 4. Chunks contain complete thoughts | 5 of 5 | 5/5 | 5/5 | 5/5 | MET |
 | 5. Answer quality: exact phrase matching | 4 of 5 | 4/5 | 4/5 | 4/5 | MET |
 
-Real output from `results/run_2026-09-29_1147_before.md`, produced by `run_eval.py::main`.
+Real output from `results/run_2026-09-29_1147_before.md`, produced by `run_eval.py::main`:
+
+**Criterion 1 example (Q3: stacking courses):**
+```
+"Three long days beats five short ones by a wide margin." (thread_commuting.txt)
+```
+
+**Criterion 2 example (Q2: meal plan window):**
+```
+Students can change their meal plan "only in the first ten days" and "you can only change it once" (thread_meal_plan_tier.txt). If they miss it, they might get "stuck on a plan I didn't use" (thread_meal_plan_tier.txt).
+```
+
+**Criterion 3 example (out-of-scope gate):**
+```
+refused (best distance 0.929) — Who won the 1994 World Cup?
+refused (best distance 0.891) — What is the capital of Mongolia?
+```
+(Gate refused all 5 of 5)
+
+**Criterion 4 evidence (sample chunk from README):**
+```
+Street parking on Verrill is legal and free and unmarked, which is why half the upper years do it.
+```
+(From thread_parking.txt#1, produced by chunker.py::split_documents)
+
+**Criterion 5 example (Q5: pass/fail, has "week eight"):**
+```
+Students can declare a course pass/fail "up to week eight" (thread_first_year_regret.txt). Before doing so, they should be careful if applying to graduate programmes, as "some want a letter grade for prerequisites and a P doesn't satisfy it," and they should also consider their limits of "Two per year and eight across the degree" (thread_pass_fail.txt).
+```
 
 <!-- Underneath, paste the REAL output for each criterion from one of your
      runs — the actual text your system produced, not a description of it.
