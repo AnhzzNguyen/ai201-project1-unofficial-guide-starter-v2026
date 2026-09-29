@@ -174,11 +174,11 @@ Students can declare a course pass/fail "up to week eight" (thread_first_year_re
 
 | # | Criterion | Verdict | How I decided |
 |---|---|---|---|
-| 1 | Retrieved chunk contains the answer | MET | 4 of 5 questions had the answer in retrieved chunks across all three runs. Q1 (laundry) was the miss — the model couldn't find "Tuesday/Wednesday" in the sources, only "Sunday evening." |
-| 2 | Every answer names a source | MET | All 5 questions × 3 runs cited their sources explicitly with filenames (thread_X.txt). |
-| 3 | Gate stops out-of-corpus questions | MET | Gate refused 5 of 5 out-of-scope questions (Mongolia, diesel oil, World Cup, ibuprofen, Rust). Target was 4 of 5. |
-| 4 | Chunks contain complete thoughts | MET | All five sample chunks in README were standalone, self-contained pieces of advice. No chunks are too small or fragmented. |
-| 5 | Answer quality: exact phrase matching | MET | 4 of 5 questions had the exact expects phrase in all three runs. Q1 again was the miss — "Sunday evening" ≠ "Tuesday". |
+| 1 | Retrieved chunk contains the answer | MET | 4 of 5 questions had the answer across all three runs (target: 4 of 5). Q1 only retrieved "Sunday evening" not "Tuesday/Wednesday." |
+| 2 | Every answer names a source | MET | All 5 questions × 3 runs cited sources with explicit filenames (thread_X.txt). No run violated this. |
+| 3 | Gate stops out-of-corpus questions | MET | Gate refused 5 of 5 out-of-scope questions (target: 4 of 5). Exceeded the target. |
+| 4 | Chunks contain complete thoughts | MET | All five sample chunks are standalone, self-contained pieces of advice with no fragments under 68 characters. |
+| 5 | Answer quality: exact phrase matching | MET | 4 of 5 questions had the exact expects phrase in all three runs (target: 4 of 5). Q1 lacked "Tuesday" keyword. |
 
 ## Diagnoses
 
