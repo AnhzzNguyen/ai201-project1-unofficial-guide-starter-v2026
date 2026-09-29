@@ -119,23 +119,15 @@ I asked Claude to review the generic GROUNDING_INSTRUCTION in generate.py and ti
 
 ## Run Log — Before
 
-<!-- Your five criteria, three runs each. `python run_eval.py --label before`
-     runs the questions, puts the OUT_OF_SCOPE ones through the gate, and
-     writes it all into results/ for you. Targets come from criteria.md; the
-     verdict column is your call.
-
-     Criterion 3 is measured in one deterministic pass rather than three, so
-     the same number goes in all three run columns. That's correct, not lazy.
-
-     Milestone 1. -->
-
 | Criterion | Target | Run 1 | Run 2 | Run 3 | Verdict |
 |---|---|---|---|---|---|
-| 1. Retrieved chunk contains the answer | 4 of 5 |  |  |  |  |
-| 2. Every answer names a source | 5 of 5 |  |  |  |  |
-| 3. Gate stops out-of-corpus questions | 4 of 5 |  |  |  |  |
-| 4. | | | | | |
-| 5. | | | | | |
+| 1. Retrieved chunk contains the answer | 4 of 5 | 4/5 | 4/5 | 4/5 | MET |
+| 2. Every answer names a source | 5 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 3. Gate stops out-of-corpus questions | 4 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 4. Chunks contain complete thoughts | 5 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 5. Answer quality: exact phrase matching | 4 of 5 | 4/5 | 4/5 | 4/5 | MET |
+
+Real output from `results/run_2026-09-29_1147_before.md`, produced by `run_eval.py::main`.
 
 <!-- Underneath, paste the REAL output for each criterion from one of your
      runs — the actual text your system produced, not a description of it.
@@ -154,21 +146,15 @@ I asked Claude to review the generic GROUNDING_INSTRUCTION in generate.py and ti
 
 | # | Criterion | Verdict | How I decided |
 |---|---|---|---|
-| 1 |  |  |  |
-| 2 |  |  |  |
-| 3 |  |  |  |
-| 4 |  |  |  |
-| 5 |  |  |  |
+| 1 | Retrieved chunk contains the answer | MET | 4 of 5 questions had the answer in retrieved chunks across all three runs. Q1 (laundry) was the miss — the model couldn't find "Tuesday/Wednesday" in the sources, only "Sunday evening." |
+| 2 | Every answer names a source | MET | All 5 questions × 3 runs cited their sources explicitly with filenames (thread_X.txt). |
+| 3 | Gate stops out-of-corpus questions | MET | Gate refused 5 of 5 out-of-scope questions (Mongolia, diesel oil, World Cup, ibuprofen, Rust). Target was 4 of 5. |
+| 4 | Chunks contain complete thoughts | MET | All five sample chunks in README were standalone, self-contained pieces of advice. No chunks are too small or fragmented. |
+| 5 | Answer quality: exact phrase matching | MET | 4 of 5 questions had the exact expects phrase in all three runs. Q1 again was the miss — "Sunday evening" ≠ "Tuesday". |
 
 ## Diagnoses
 
-<!-- For each miss: which stage caused it, and how. The stage alone isn't
-     enough — you need the mechanism.
-
-     Not a diagnosis: "Question 3 didn't work."
-     A diagnosis:     "Question 3 asks about laundry costs. The answer is in
-                       one sentence that got split across two chunks, so
-                       neither chunk on its own contains it."
+**Q1 (laundry timing):** The question asks "When is laundry free...and which days should students avoid?" The answer in the corpus covers both: "Tuesday and Wednesday mornings...Sunday evening is the worst." However, the retrieved chunk ranked best (0.520 distance) didn't include the "Tuesday/Wednesday" part—only the "Sunday evening" part made it to the top retrieval. The chunker splits on reply boundaries, and this advice spans one reply, so it should be one chunk. The embedding distance (0.520) is weaker than expected for such a direct match. This suggests a semantic mismatch between the question phrasing ("When is laundry free?") and the chunk text ("Tuesday and Wednesday mornings")—the embedding model may not recognize "free" ≈ "mornings" as closely related. Retrieval stage issue, not chunking."
 
      The five stages: loading → chunking → embedding → retrieval → generation.
 
