@@ -230,7 +230,7 @@ Real output from `results/run_2026-09-29_1845_after.md`, produced by `run_eval.p
 
 **Did it help?**
 
-No. The hybrid search (BM25 + semantic fusion) moved the laundry_timing chunk from position 5 to position 2 in the ranking, but didn't improve the gate passage rate or answer quality. The reason: the gate only checks the semantic distance of the top-ranked result, not the fusion score. The top result after ranking is still a false-positive (commuter lounge) with distance 0.627 > cutoff. The laundry chunk, now at position 2, has distance 0.633 — still above the 0.6 threshold. The fundamental issue wasn't ranking position but embedding distance. Hybrid search helped ranking but didn't solve the weak semantic alignment between "When is laundry free?" and the laundry advice text.
+No — hybrid search improved ranking position (laundry chunk #5 → #2) but the gate only checks semantic distance of the top result, and the top result remains a false positive (0.627 > 0.60 cutoff), so the laundry chunk's ranking improvement never helped passage or answer quality.
 
 <!-- Say plainly whether it did, and how you know. If it made things worse,
      say that — a change that backfired, honestly reported, earns full credit
