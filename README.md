@@ -220,13 +220,17 @@ Students can declare a course pass/fail "up to week eight" (thread_first_year_re
 
 | Criterion | Target | Run 1 | Run 2 | Run 3 | Verdict |
 |---|---|---|---|---|---|
-| 1. Retrieved chunk contains the answer | 4 of 5 |  |  |  |  |
-| 2. Every answer names a source | 5 of 5 |  |  |  |  |
-| 3. Gate stops out-of-corpus questions | 4 of 5 |  |  |  |  |
-| 4. | | | | | |
-| 5. | | | | | |
+| 1. Retrieved chunk contains the answer | 4 of 5 | 4/5 | 4/5 | 4/5 | MET |
+| 2. Every answer names a source | 5 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 3. Gate stops out-of-corpus questions | 4 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 4. Chunks contain complete thoughts | 5 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 5. Answer quality: exact phrase matching | 4 of 5 | 4/5 | 4/5 | 4/5 | MET |
+
+Real output from `results/run_2026-09-29_1845_after.md`, produced by `run_eval.py::main` with hybrid search.
 
 **Did it help?**
+
+No. The hybrid search (BM25 + semantic fusion) moved the laundry_timing chunk from position 5 to position 2 in the ranking, but didn't improve the gate passage rate or answer quality. The reason: the gate only checks the semantic distance of the top-ranked result, not the fusion score. The top result after ranking is still a false-positive (commuter lounge) with distance 0.627 > cutoff. The laundry chunk, now at position 2, has distance 0.633 — still above the 0.6 threshold. The fundamental issue wasn't ranking position but embedding distance. Hybrid search helped ranking but didn't solve the weak semantic alignment between "When is laundry free?" and the laundry advice text.
 
 <!-- Say plainly whether it did, and how you know. If it made things worse,
      say that — a change that backfired, honestly reported, earns full credit
