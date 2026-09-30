@@ -241,17 +241,24 @@ No — hybrid search improved ranking position (laundry chunk #5 → #2) but the
 
 ## What's Still Broken
 
-<!-- For each criterion still missed after your fix: what you'd do about it,
-     and why you stopped where you did.
+**Criteria 1 and 5: Q1 (laundry timing) still fails.** The embedding distance between "When is laundry free in the dorms?" and "Tuesday and Wednesday mornings, every building" is 0.633 — just above the 0.6 gate cutoff. The gate rejects it before generation even happens.
 
-     "I ran out of time" is fine if it's true. Pretending nothing is left is
-     not.
+What I'd do: Lower the gate threshold to 0.65 for this specific query pattern (time-based questions asking "when is X free"). The laundry chunk is clearly relevant (it's the exact answer), but the embedding model doesn't recognize the semantic connection between "free" and "mornings." A corpus-specific threshold for temporal questions would catch this without relaxing the gate for all questions.
 
-     Milestone 5. -->
+Why I stopped: The gate threshold is global across all questions, and lowering it to 0.65 would risk admitting out-of-corpus questions that cluster just above 0.6. I'd need to either (a) implement per-question thresholds based on question type, or (b) redesign the embedding model fine-tuning to better align temporal language. Both are beyond the scope of a single iteration.
 
 ## What I'd Do Differently
 
-<!-- Knowing what you know now — which of your five criteria would you write
-     differently, and why?
+**Criterion 1: "Retrieved chunks contain answer" — I'd add a distance threshold to the measurement.** 
 
-     Milestone 5. -->
+Current: "4 of 5 questions have the answer in the retrieved chunks."
+
+Better: "4 of 5 questions have the answer in the top-7 results AND the answer chunk has distance < 0.55."
+
+Why: Criterion 1 passed (4/5) but it masked the Q1 problem. The laundry chunk is retrieved but at distance 0.633, barely available to the gate. A distance-based sub-criterion would surface embedding weaknesses earlier and help distinguish between "the answer exists somewhere in the corpus" versus "the system can actually use it." This would have caught Q1's problem in Unit 1 instead of Unit 2.
+
+## How I Used AI — Unit 2
+
+**Debugging the hybrid search impact:**
+
+I asked Claude to explain why hybrid search moved the laundry chunk from position 5 to position 2 but didn't improve gate passage. Claude pointed out that I was confusing ranking position with gate logic: the gate checks the semantic distance of the top result, not the fusion score. The laundry chunk's improved ranking never mattered because a false positive (commuter lounge) ranked first with distance 0.627. This clarification forced me to diagnose the real problem: embedding distance, not ranking — and to report honestly that the fix backfired.
